@@ -3,23 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostModel } from './entities/post.entity';
 
-/**
- * author: string;
- * title: string;
- * content: string;
- * likeCount: number;
- * commentCount: number;
- */
-
-export interface PostModel {
-  id: number;
-  author: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-}
-
 let posts: PostModel[] = [
   {
     id: 1,
@@ -53,12 +36,16 @@ export class PostsService {
     @InjectRepository(PostModel)
     private readonly postRepository: Repository<PostModel>,
   ) {}
-  getAllPosst() {
-    return posts;
+  async getAllPosst() {
+    return this.postRepository.find();
   }
 
-  getPostById(id: number) {
-    const post = posts.find((post) => post.id === +id);
+  async getPostById(id: number) {
+    const post = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
 
     if (!post) {
       throw new NotFoundException();
